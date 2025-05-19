@@ -13,6 +13,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/modal-fix.css">
 
     @yield('styles')
 </head>
@@ -174,6 +175,7 @@
 
     <!-- Custom JS -->
     <script src="/js/script.js"></script>
+    <script src="/js/modal-fix.js"></script>
 
     @yield('scripts')
 </body>

@@ -110,27 +110,33 @@
                     <div class="mb-3">
                         <label class="form-label">Status</label>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="status-all" name="status[]" value="all" checked>
+                            <input class="form-check-input status-checkbox" type="checkbox" id="status-all" name="status[]" value="all"
+                                {{ empty($filters['status']) || in_array('all', $filters['status'] ?? []) ? 'checked' : '' }}>
                             <label class="form-check-label" for="status-all">All</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="status-pending" name="status[]" value="pending">
+                            <input class="form-check-input status-checkbox" type="checkbox" id="status-pending" name="status[]" value="pending"
+                                {{ in_array('pending', $filters['status'] ?? []) ? 'checked' : '' }}>
                             <label class="form-check-label" for="status-pending">Pending</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="status-preparing" name="status[]" value="preparing">
+                            <input class="form-check-input status-checkbox" type="checkbox" id="status-preparing" name="status[]" value="preparing"
+                                {{ in_array('preparing', $filters['status'] ?? []) ? 'checked' : '' }}>
                             <label class="form-check-label" for="status-preparing">Preparing</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="status-out_for_delivery" name="status[]" value="out_for_delivery">
+                            <input class="form-check-input status-checkbox" type="checkbox" id="status-out_for_delivery" name="status[]" value="out_for_delivery"
+                                {{ in_array('out_for_delivery', $filters['status'] ?? []) ? 'checked' : '' }}>
                             <label class="form-check-label" for="status-out_for_delivery">Out for Delivery</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="status-delivered" name="status[]" value="delivered">
+                            <input class="form-check-input status-checkbox" type="checkbox" id="status-delivered" name="status[]" value="delivered"
+                                {{ in_array('delivered', $filters['status'] ?? []) ? 'checked' : '' }}>
                             <label class="form-check-label" for="status-delivered">Delivered</label>
                         </div>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="status-cancelled" name="status[]" value="cancelled">
+                            <input class="form-check-input status-checkbox" type="checkbox" id="status-cancelled" name="status[]" value="cancelled"
+                                {{ in_array('cancelled', $filters['status'] ?? []) ? 'checked' : '' }}>
                             <label class="form-check-label" for="status-cancelled">Cancelled</label>
                         </div>
                     </div>
@@ -139,18 +145,22 @@
                         <label for="vendor" class="form-label">Vendor</label>
                         <select class="form-select" id="vendor" name="vendor">
                             <option value="">All Vendors</option>
-                            <!-- Vendor options would be populated here -->
+                            @foreach($vendors as $vendor)
+                                <option value="{{ $vendor['id'] }}" {{ $filters['vendor'] == $vendor['id'] ? 'selected' : '' }}>
+                                    {{ $vendor['business_name'] }}
+                                </option>
+                            @endforeach
                         </select>
                     </div>
 
                     <div class="mb-3">
                         <label for="date-range" class="form-label">Date Range</label>
                         <select class="form-select" id="date-range" name="date_range">
-                            <option value="all">All Time</option>
-                            <option value="today">Today</option>
-                            <option value="week">This Week</option>
-                            <option value="month">This Month</option>
-                            <option value="year">This Year</option>
+                            <option value="all" {{ $filters['date_range'] == 'all' ? 'selected' : '' }}>All Time</option>
+                            <option value="today" {{ $filters['date_range'] == 'today' ? 'selected' : '' }}>Today</option>
+                            <option value="week" {{ $filters['date_range'] == 'week' ? 'selected' : '' }}>This Week</option>
+                            <option value="month" {{ $filters['date_range'] == 'month' ? 'selected' : '' }}>This Month</option>
+                            <option value="year" {{ $filters['date_range'] == 'year' ? 'selected' : '' }}>This Year</option>
                         </select>
                     </div>
 
@@ -163,4 +173,52 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle "All" checkbox behavior
+        const allStatusCheckbox = document.getElementById('status-all');
+        const statusCheckboxes = document.querySelectorAll('.status-checkbox:not(#status-all)');
+
+        // When "All" is checked, uncheck others
+        allStatusCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                statusCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+            }
+        });
+
+        // When any other status is checked, uncheck "All"
+        statusCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    allStatusCheckbox.checked = false;
+                }
+
+                // If no status is checked, check "All"
+                const anyChecked = Array.from(statusCheckboxes).some(cb => cb.checked);
+                if (!anyChecked) {
+                    allStatusCheckbox.checked = true;
+                }
+            });
+        });
+
+        // Add active class to the current tab based on filter
+        const statusFiltersJson = '{!! json_encode($filters["status"] ?? []) !!}';
+        const statusFilters = JSON.parse(statusFiltersJson);
+
+        if (statusFilters.length > 0 && !statusFilters.includes('all')) {
+            // Find the first status in the filter
+            const firstStatus = statusFilters[0];
+            // Find the corresponding tab and activate it
+            const tabElement = document.querySelector(`a[href="#${firstStatus}"]`);
+            if (tabElement) {
+                tabElement.click();
+            }
+        }
+    });
+</script>
 @endsection

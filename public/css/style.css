@@ -24,6 +24,8 @@ a:hover {
 }
 
 .navbar {
+    /* color: white;
+    background: linear-gradient(to top,red,green); */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 

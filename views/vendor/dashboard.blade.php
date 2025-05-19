@@ -102,22 +102,22 @@
                     <p class="text-muted">{{ $vendor['location'] }}</p>
                 </div>
                 <div class="mb-3">
-                    <p class="mb-1"><strong>Status:</strong> 
+                    <p class="mb-1"><strong>Status:</strong>
                         @if($vendor['is_approved'])
                             <span class="badge bg-success">Approved</span>
                         @else
                             <span class="badge bg-warning">Pending Approval</span>
                         @endif
                     </p>
-                    <p class="mb-1"><strong>Featured:</strong> 
+                    <p class="mb-1"><strong>Featured:</strong>
                         @if($vendor['is_featured'])
                             <span class="badge bg-primary">Featured</span>
                         @else
                             <span class="badge bg-secondary">Not Featured</span>
                         @endif
                     </p>
-                    <p class="mb-1"><strong>Contact:</strong> {{ $vendor['contact_phone'] }}</p>
-                    <p class="mb-1"><strong>Email:</strong> {{ $vendor['contact_email'] }}</p>
+                    <p class="mb-1"><strong>Contact:</strong> {{ $vendor['phone'] ?? 'Not specified' }}</p>
+                    <p class="mb-1"><strong>Email:</strong> {{ $vendor['email'] ?? 'Not specified' }}</p>
                 </div>
                 <a href="/profile" class="btn btn-outline-primary btn-sm w-100">Edit Profile</a>
             </div>
@@ -185,17 +185,22 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="col-md-3 col-sm-6 mb-3">
                         <a href="/vendor/products/add" class="btn btn-primary w-100 py-3">
                             <i class="fas fa-plus-circle me-2"></i> Add Product
                         </a>
                     </div>
-                    <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="col-md-3 col-sm-6 mb-3">
                         <a href="/vendor/products" class="btn btn-success w-100 py-3">
                             <i class="fas fa-hamburger me-2"></i> Manage Products
                         </a>
                     </div>
-                    <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="col-md-3 col-sm-6 mb-3">
+                        <a href="/vendor/categories" class="btn btn-secondary w-100 py-3">
+                            <i class="fas fa-tags me-2"></i> Manage Categories
+                        </a>
+                    </div>
+                    <div class="col-md-3 col-sm-6 mb-3">
                         <a href="/vendor/orders" class="btn btn-info w-100 py-3 text-white">
                             <i class="fas fa-truck me-2"></i> Manage Orders
                         </a>

@@ -813,13 +813,38 @@ class AdminController {
         // Check if user is an admin
         Auth::requireRole('admin');
 
-        // Get orders
+        // Get filter parameters
+        $statuses = $_GET['status'] ?? [];
+        $vendorId = $_GET['vendor'] ?? null;
+        $dateRange = $_GET['date_range'] ?? 'all';
+
+        // Build filters array
+        $filters = [
+            'status' => $statuses,
+            'vendor' => $vendorId,
+            'date_range' => $dateRange
+        ];
+
+        // Get orders based on filters
         $orderModel = new Order();
-        $orders = $orderModel->getRecent(100);
+
+        if (empty($filters['status']) && empty($filters['vendor']) && $filters['date_range'] === 'all') {
+            // No filters applied, get recent orders
+            $orders = $orderModel->getRecent(100);
+        } else {
+            // Apply filters
+            $orders = $orderModel->filter($filters);
+        }
+
+        // Get vendors for filter dropdown
+        $vendorModel = new Vendor();
+        $vendors = $vendorModel->getAllWithUserDetails();
 
         $this->view->render("admin.orders", [
             "title" => "Manage Orders",
-            "orders" => $orders
+            "orders" => $orders,
+            "vendors" => $vendors,
+            "filters" => $filters
         ]);
     }
 

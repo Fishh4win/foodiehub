@@ -14,6 +14,7 @@ $router = new Router;
 $router->get("/", "HomeController@index");
 $router->get("/about", "HomeController@about");
 $router->get("/contact", "HomeController@contact");
+$router->post("/contact/send", "HomeController@sendContactForm");
 
 // Auth routes
 $router->get("/login", "AuthController@showLogin");
@@ -50,12 +51,24 @@ $router->post("/orders/cancel", "OrderController@cancel");
 
 // Vendor routes
 $router->get("/vendor/dashboard", "VendorController@dashboard");
+
+// Vendor Product Management
 $router->get("/vendor/products", "VendorController@products");
 $router->get("/vendor/products/add", "VendorController@showAddProduct");
 $router->post("/vendor/products/add", "VendorController@addProduct");
 $router->get("/vendor/products/edit/{id}", "VendorController@showEditProduct");
 $router->post("/vendor/products/edit", "VendorController@editProduct");
 $router->post("/vendor/products/delete", "VendorController@deleteProduct");
+$router->post("/vendor/products/toggle-availability", "VendorController@toggleProductAvailability");
+
+// Vendor Category Management
+$router->get("/vendor/categories", "VendorController@categories");
+$router->get("/vendor/categories/add", "VendorController@showAddCategory");
+$router->post("/vendor/categories/add", "VendorController@addCategory");
+$router->get("/vendor/categories/edit/{id}", "VendorController@showEditCategory");
+$router->post("/vendor/categories/edit", "VendorController@editCategory");
+
+// Vendor Order Management
 $router->get("/vendor/orders", "VendorController@orders");
 $router->get("/vendor/orders/{id}", "OrderController@details");
 $router->post("/vendor/orders/update-status", "VendorController@updateOrderStatus");

@@ -1,0 +1,107 @@
+/* Modal Fix CSS */
+
+/* Prevent modal content from shifting */
+.modal {
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
+/* Prevent flickering during transitions */
+.modal-backdrop {
+    will-change: opacity;
+    backface-visibility: hidden;
+}
+
+/* Smooth transitions */
+.modal.fade .modal-dialog {
+    transition: transform 0.2s ease-out !important;
+}
+
+/* Fix for modal content */
+.modal-content {
+    border: none;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Fix for modal header */
+.modal-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Fix for modal footer */
+.modal-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Fix for modal body padding */
+.modal-body {
+    padding: 1.5rem;
+}
+
+/* Fix for modal dialog margin */
+.modal-dialog {
+    margin: 1.75rem auto;
+}
+
+/* Fix for modal backdrop */
+.modal-backdrop.show {
+    opacity: 0.5;
+}
+
+/* Fix for modal animation */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Apply animation to modal content */
+.modal.show .modal-content {
+    animation: modalFadeIn 0.2s ease-out;
+}
+
+/* Fix for modal scrollbar */
+.modal-open {
+    overflow: hidden;
+    padding-right: 0 !important;
+}
+
+/* Fix for modal open body padding */
+body.modal-open {
+    padding-right: 0 !important;
+}
+
+/* Fix for multiple modals */
+.modal-open .modal {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Fix for modal dialog centering */
+@media (min-width: 576px) {
+    .modal-dialog {
+        max-width: 500px;
+        margin: 1.75rem auto;
+    }
+}
+
+/* Fix for large modal */
+@media (min-width: 992px) {
+    .modal-lg, 
+    .modal-xl {
+        max-width: 800px;
+    }
+}
+
+/* Fix for extra large modal */
+@media (min-width: 1200px) {
+    .modal-xl {
+        max-width: 1140px;
+    }
+}

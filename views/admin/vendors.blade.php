@@ -2,6 +2,64 @@
 
 @section('title', $title)
 
+@section('styles')
+<style>
+    /* Modal fix styles */
+    .modal {
+        will-change: transform;
+        backface-visibility: hidden;
+        transform: translateZ(0);
+    }
+
+    .modal-backdrop {
+        will-change: opacity;
+        backface-visibility: hidden;
+    }
+
+    .modal.fade .modal-dialog {
+        transition: transform 0.2s ease-out !important;
+    }
+
+    .modal-content {
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Vendor modal specific styles */
+    #viewVendorModal .modal-body {
+        padding: 1.5rem;
+    }
+
+    /* Fix for modal animation */
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Apply animation to modal content */
+    .modal.show .modal-content {
+        animation: modalFadeIn 0.2s ease-out;
+    }
+
+    /* Fix for modal open body padding */
+    body.modal-open-fix {
+        padding-right: 0 !important;
+    }
+
+    /* Fix for modal scrollbar */
+    .modal-open {
+        overflow: hidden;
+        padding-right: 0 !important;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="card shadow-sm">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -79,7 +137,7 @@
                                     </td>
                                     <td>
                                         <div class="btn-group">
-                                            <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewVendorModal{{ $vendor['id'] }}">
+                                            <a href="#" class="btn btn-sm btn-outline-primary vendor-modal-trigger" data-bs-toggle="modal" data-bs-target="#viewVendorModal{{ $vendor['id'] }}">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             <a href="/admin/vendors/edit/{{ $vendor['id'] }}" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="Edit Vendor">
@@ -272,7 +330,7 @@
                                         <td>{{ $vendor['location'] }}</td>
                                         <td>
                                             <div class="btn-group">
-                                                <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewVendorModal{{ $vendor['id'] }}">
+                                                <a href="#" class="btn btn-sm btn-outline-primary vendor-modal-trigger" data-bs-toggle="modal" data-bs-target="#viewVendorModal{{ $vendor['id'] }}">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 <a href="/admin/vendors/edit/{{ $vendor['id'] }}" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="Edit Vendor">
@@ -358,4 +416,83 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix for modal flickering
+        document.body.classList.add('modal-open-fix');
+
+        // Store modal instances to prevent flickering
+        const vendorModals = {};
+
+        // Initialize all vendor modals
+        document.querySelectorAll('[id^="viewVendorModal"]').forEach(modalElement => {
+            const modalId = modalElement.id;
+
+            // Detach modal from DOM and reattach to body to prevent flickering
+            const modalContent = modalElement.innerHTML;
+            const modalParent = modalElement.parentNode;
+            modalParent.removeChild(modalElement);
+
+            // Create a new modal element
+            const newModal = document.createElement('div');
+            newModal.id = modalId;
+            newModal.className = modalElement.className;
+            newModal.setAttribute('tabindex', '-1');
+            newModal.setAttribute('aria-hidden', 'true');
+            newModal.innerHTML = modalContent;
+
+            // Append to body instead of being nested in table
+            document.body.appendChild(newModal);
+
+            // Initialize Bootstrap modal
+            const modalInstance = new bootstrap.Modal(newModal, {
+                backdrop: 'static',  // Prevent closing when clicking outside
+                keyboard: true       // Allow ESC key to close
+            });
+
+            // Store modal instance and state
+            vendorModals[modalId] = {
+                instance: modalInstance,
+                isShown: false,
+                element: newModal
+            };
+
+            // Prevent default behavior and handle modal events
+            newModal.addEventListener('show.bs.modal', function(event) {
+                // Prevent default behavior if needed
+                if (vendorModals[modalId].isShown) {
+                    event.preventDefault();
+                    return;
+                }
+
+                // Update state
+                vendorModals[modalId].isShown = true;
+            });
+
+            newModal.addEventListener('hidden.bs.modal', function() {
+                // Update state
+                vendorModals[modalId].isShown = false;
+            });
+        });
+
+        // Handle modal trigger clicks
+        document.querySelectorAll('.vendor-modal-trigger').forEach(trigger => {
+            const targetId = trigger.getAttribute('data-bs-target').substring(1); // Remove the # character
+
+            trigger.addEventListener('click', function(event) {
+                event.preventDefault();
+
+                if (vendorModals[targetId]) {
+                    // Only show if not already shown
+                    if (!vendorModals[targetId].isShown) {
+                        vendorModals[targetId].instance.show();
+                    }
+                }
+            });
+        });
+    });
+</script>
 @endsection

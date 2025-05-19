@@ -2,6 +2,64 @@
 
 @section('title', $title)
 
+@section('styles')
+<style>
+    /* Modal fix styles */
+    .modal {
+        will-change: transform;
+        backface-visibility: hidden;
+        transform: translateZ(0);
+    }
+
+    .modal-backdrop {
+        will-change: opacity;
+        backface-visibility: hidden;
+    }
+
+    .modal.fade .modal-dialog {
+        transition: transform 0.2s ease-out !important;
+    }
+
+    .modal-content {
+        border: none;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    /* User modal specific styles */
+    .user-modal .modal-body {
+        padding: 1.5rem;
+    }
+
+    /* Fix for modal animation */
+    @keyframes modalFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Apply animation to modal content */
+    .modal.show .modal-content {
+        animation: modalFadeIn 0.2s ease-out;
+    }
+
+    /* Fix for modal open body padding */
+    body.modal-open-fix {
+        padding-right: 0 !important;
+    }
+
+    /* Fix for modal scrollbar */
+    .modal-open {
+        overflow: hidden;
+        padding-right: 0 !important;
+    }
+</style>
+@endsection
+
 @section('content')
 <div class="card shadow-sm">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
@@ -73,7 +131,7 @@
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </div>
-                                
+
                                 <!-- Edit User Modal -->
                                 <div class="modal fade" id="editUserModal{{ $user['id'] }}" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog">
@@ -85,17 +143,17 @@
                                             <div class="modal-body">
                                                 <form action="/admin/users/edit" method="POST">
                                                     <input type="hidden" name="user_id" value="{{ $user['id'] }}">
-                                                    
+
                                                     <div class="mb-3">
                                                         <label for="name{{ $user['id'] }}" class="form-label">Name</label>
                                                         <input type="text" class="form-control" id="name{{ $user['id'] }}" name="name" value="{{ $user['name'] }}" required>
                                                     </div>
-                                                    
+
                                                     <div class="mb-3">
                                                         <label for="email{{ $user['id'] }}" class="form-label">Email</label>
                                                         <input type="email" class="form-control" id="email{{ $user['id'] }}" name="email" value="{{ $user['email'] }}" required>
                                                     </div>
-                                                    
+
                                                     <div class="mb-3">
                                                         <label for="role{{ $user['id'] }}" class="form-label">Role</label>
                                                         <select class="form-select" id="role{{ $user['id'] }}" name="role" required>
@@ -104,12 +162,12 @@
                                                             <option value="admin" {{ $user['role'] === 'admin' ? 'selected' : '' }}>Admin</option>
                                                         </select>
                                                     </div>
-                                                    
+
                                                     <div class="mb-3">
                                                         <label for="password{{ $user['id'] }}" class="form-label">New Password (leave blank to keep current)</label>
                                                         <input type="password" class="form-control" id="password{{ $user['id'] }}" name="password">
                                                     </div>
-                                                    
+
                                                     <div class="d-flex justify-content-end">
                                                         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
                                                         <button type="submit" class="btn btn-primary">Save Changes</button>
@@ -119,7 +177,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Delete User Modal -->
                                 <div class="modal fade" id="deleteUserModal{{ $user['id'] }}" tabindex="-1" aria-hidden="true">
                                     <div class="modal-dialog">
@@ -165,12 +223,12 @@
                         <label for="name" class="form-label">Name</label>
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" required>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="role" class="form-label">Role</label>
                         <select class="form-select" id="role" name="role" required>
@@ -179,12 +237,12 @@
                             <option value="admin">Admin</option>
                         </select>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password" required>
                     </div>
-                    
+
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Add User</button>
@@ -224,7 +282,7 @@
                             <label class="form-check-label" for="role-admin">Admin</label>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="date-range" class="form-label">Date Range</label>
                         <select class="form-select" id="date-range" name="date_range">
@@ -235,7 +293,7 @@
                             <option value="year">This Year</option>
                         </select>
                     </div>
-                    
+
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Apply Filters</button>
@@ -245,4 +303,168 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fix for modal flickering
+        document.body.classList.add('modal-open-fix');
+
+        // Store modal instances to prevent flickering
+        const userModals = {};
+
+        // Process edit user modals
+        document.querySelectorAll('[id^="editUserModal"]').forEach(modalElement => {
+            const modalId = modalElement.id;
+
+            // Detach modal from DOM and reattach to body to prevent flickering
+            const modalContent = modalElement.innerHTML;
+            const modalParent = modalElement.parentNode;
+            modalParent.removeChild(modalElement);
+
+            // Create a new modal element
+            const newModal = document.createElement('div');
+            newModal.id = modalId;
+            newModal.className = modalElement.className + ' user-modal';
+            newModal.setAttribute('tabindex', '-1');
+            newModal.setAttribute('aria-hidden', 'true');
+            newModal.innerHTML = modalContent;
+
+            // Append to body instead of being nested in table
+            document.body.appendChild(newModal);
+
+            // Initialize Bootstrap modal
+            const modalInstance = new bootstrap.Modal(newModal, {
+                backdrop: 'static',  // Prevent closing when clicking outside
+                keyboard: true       // Allow ESC key to close
+            });
+
+            // Store modal instance and state
+            userModals[modalId] = {
+                instance: modalInstance,
+                isShown: false,
+                element: newModal
+            };
+
+            // Prevent default behavior and handle modal events
+            newModal.addEventListener('show.bs.modal', function(event) {
+                // Prevent default behavior if needed
+                if (userModals[modalId].isShown) {
+                    event.preventDefault();
+                    return;
+                }
+
+                // Update state
+                userModals[modalId].isShown = true;
+            });
+
+            newModal.addEventListener('hidden.bs.modal', function() {
+                // Update state
+                userModals[modalId].isShown = false;
+            });
+        });
+
+        // Process delete user modals
+        document.querySelectorAll('[id^="deleteUserModal"]').forEach(modalElement => {
+            const modalId = modalElement.id;
+
+            // Detach modal from DOM and reattach to body to prevent flickering
+            const modalContent = modalElement.innerHTML;
+            const modalParent = modalElement.parentNode;
+            modalParent.removeChild(modalElement);
+
+            // Create a new modal element
+            const newModal = document.createElement('div');
+            newModal.id = modalId;
+            newModal.className = modalElement.className + ' user-modal';
+            newModal.setAttribute('tabindex', '-1');
+            newModal.setAttribute('aria-hidden', 'true');
+            newModal.innerHTML = modalContent;
+
+            // Append to body instead of being nested in table
+            document.body.appendChild(newModal);
+
+            // Initialize Bootstrap modal
+            const modalInstance = new bootstrap.Modal(newModal, {
+                backdrop: 'static',
+                keyboard: true
+            });
+
+            // Store modal instance and state
+            userModals[modalId] = {
+                instance: modalInstance,
+                isShown: false,
+                element: newModal
+            };
+
+            // Prevent default behavior and handle modal events
+            newModal.addEventListener('show.bs.modal', function(event) {
+                if (userModals[modalId].isShown) {
+                    event.preventDefault();
+                    return;
+                }
+
+                userModals[modalId].isShown = true;
+            });
+
+            newModal.addEventListener('hidden.bs.modal', function() {
+                userModals[modalId].isShown = false;
+            });
+        });
+
+        // Process add user and filter modals
+        ['addUserModal', 'filterModal'].forEach(modalId => {
+            const modalElement = document.getElementById(modalId);
+            if (modalElement) {
+                // Initialize Bootstrap modal
+                const modalInstance = new bootstrap.Modal(modalElement, {
+                    backdrop: 'static',
+                    keyboard: true
+                });
+
+                // Store modal instance and state
+                userModals[modalId] = {
+                    instance: modalInstance,
+                    isShown: false,
+                    element: modalElement
+                };
+
+                // Prevent default behavior and handle modal events
+                modalElement.addEventListener('show.bs.modal', function(event) {
+                    if (userModals[modalId].isShown) {
+                        event.preventDefault();
+                        return;
+                    }
+
+                    userModals[modalId].isShown = true;
+                });
+
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    userModals[modalId].isShown = false;
+                });
+            }
+        });
+
+        // Handle modal trigger clicks for edit and delete modals
+        document.querySelectorAll('[data-bs-toggle="modal"]').forEach(trigger => {
+            const targetId = trigger.getAttribute('data-bs-target').substring(1); // Remove the # character
+
+            if (targetId.startsWith('editUserModal') || targetId.startsWith('deleteUserModal') ||
+                targetId === 'addUserModal' || targetId === 'filterModal') {
+
+                trigger.addEventListener('click', function(event) {
+                    event.preventDefault();
+
+                    if (userModals[targetId]) {
+                        // Only show if not already shown
+                        if (!userModals[targetId].isShown) {
+                            userModals[targetId].instance.show();
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>
 @endsection

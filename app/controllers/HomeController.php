@@ -56,4 +56,29 @@ class HomeController {
             "title" => "Contact Us"
         ]);
     }
+
+    /**
+     * Process contact form submission
+     */
+    public function sendContactForm() {
+        // Get form data
+        $name = $_POST['name'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $subject = $_POST['subject'] ?? '';
+        $message = $_POST['message'] ?? '';
+
+        // Validate form data
+        if (empty($name) || empty($email) || empty($subject) || empty($message)) {
+            Session::setFlash('error', 'Please fill in all required fields');
+            header('Location: /contact');
+            exit;
+        }
+
+        // In a real application, you would send an email here
+        // For now, we'll just simulate a successful submission
+
+        Session::setFlash('success', 'Thank you for your message! We will get back to you soon.');
+        header('Location: /contact');
+        exit;
+    }
 }
