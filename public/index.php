@@ -1,0 +1,88 @@
+<?php
+require_once __DIR__ . '/../vendor/autoload.php';
+
+use App\Core\Router;
+use App\Core\Session;
+
+// Start session
+Session::start();
+
+$router = new Router;
+
+// Home routes
+$router->get("/", "HomeController@index");
+$router->get("/about", "HomeController@about");
+$router->get("/contact", "HomeController@contact");
+
+// Auth routes
+$router->get("/login", "AuthController@showLogin");
+$router->post("/login", "AuthController@login");
+$router->get("/register", "AuthController@showRegister");
+$router->post("/register", "AuthController@registerCustomer");
+$router->get("/vendor/register", "AuthController@showVendorRegister");
+$router->post("/vendor/register", "AuthController@registerVendor");
+$router->get("/logout", "AuthController@logout");
+
+// Product routes
+$router->get("/products", "ProductController@list");
+$router->get("/products/{id}", "ProductController@details");
+$router->post("/products/add-to-cart", "ProductController@addToCart");
+$router->post("/products/review", "ProductController@submitReview");
+$router->get("/search", "ProductController@search");
+
+// Cart routes
+$router->get("/cart", "CartController@index");
+$router->post("/cart/add", "CartController@add");
+$router->post("/cart/update", "CartController@update");
+$router->post("/cart/remove", "CartController@remove");
+$router->post("/cart/clear", "CartController@clear");
+$router->get("/cart/checkout", "CartController@checkout");
+
+// Order routes
+$router->post("/orders/place", "OrderController@place");
+$router->get("/orders", "OrderController@list");
+$router->get("/orders/{id}", "OrderController@details");
+$router->post("/orders/cancel", "OrderController@cancel");
+
+// Vendor routes
+$router->get("/vendor/dashboard", "VendorController@dashboard");
+$router->get("/vendor/products", "VendorController@products");
+$router->get("/vendor/products/add", "VendorController@showAddProduct");
+$router->post("/vendor/products/add", "VendorController@addProduct");
+$router->get("/vendor/products/edit/{id}", "VendorController@showEditProduct");
+$router->post("/vendor/products/edit", "VendorController@editProduct");
+$router->post("/vendor/products/delete", "VendorController@deleteProduct");
+$router->get("/vendor/orders", "VendorController@orders");
+$router->get("/vendor/orders/{id}", "OrderController@details");
+$router->post("/vendor/orders/update-status", "VendorController@updateOrderStatus");
+
+// Admin routes
+$router->get("/admin/dashboard", "AdminController@dashboard");
+
+// Admin User Management
+$router->get("/admin/users", "AdminController@users");
+$router->post("/admin/users/add", "AdminController@addUser");
+$router->post("/admin/users/edit", "AdminController@editUser");
+$router->post("/admin/users/delete", "AdminController@deleteUser");
+
+// Admin Vendor Management
+$router->get("/admin/vendors", "AdminController@vendors");
+$router->post("/admin/vendors/approve", "AdminController@approveVendor");
+$router->post("/admin/vendors/disapprove", "AdminController@disapproveVendor");
+$router->post("/admin/vendors/feature", "AdminController@featureVendor");
+$router->post("/admin/vendors/unfeature", "AdminController@unfeatureVendor");
+
+// Admin Category Management
+$router->get("/admin/categories", "AdminController@categories");
+$router->get("/admin/categories/add", "AdminController@showAddCategory");
+$router->post("/admin/categories/add", "AdminController@addCategory");
+$router->get("/admin/categories/edit/{id}", "AdminController@showEditCategory");
+$router->post("/admin/categories/edit", "AdminController@editCategory");
+$router->post("/admin/categories/delete", "AdminController@deleteCategory");
+
+// Admin Order Management
+$router->get("/admin/orders", "AdminController@orders");
+$router->get("/admin/orders/{id}", "OrderController@details");
+
+// Dispatch the request
+$router->dispatch($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
