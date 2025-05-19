@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../app/helpers.php';
 
 use App\Core\Router;
 use App\Core\Session;
@@ -26,7 +27,6 @@ $router->get("/logout", "AuthController@logout");
 // Product routes
 $router->get("/products", "ProductController@list");
 $router->get("/products/{id}", "ProductController@details");
-$router->post("/products/add-to-cart", "ProductController@addToCart");
 $router->post("/products/review", "ProductController@submitReview");
 $router->get("/search", "ProductController@search");
 
@@ -37,6 +37,10 @@ $router->post("/cart/update", "CartController@update");
 $router->post("/cart/remove", "CartController@remove");
 $router->post("/cart/clear", "CartController@clear");
 $router->get("/cart/checkout", "CartController@checkout");
+
+// User routes
+$router->get("/profile", "UserController@profile");
+$router->post("/profile/update", "UserController@updateProfile");
 
 // Order routes
 $router->post("/orders/place", "OrderController@place");
@@ -67,6 +71,9 @@ $router->post("/admin/users/delete", "AdminController@deleteUser");
 
 // Admin Vendor Management
 $router->get("/admin/vendors", "AdminController@vendors");
+$router->get("/admin/vendors/edit/{id}", "AdminController@showEditVendor");
+$router->post("/admin/vendors/edit", "AdminController@editVendor");
+$router->get("/admin/vendors/{id}/products", "AdminController@vendorProducts");
 $router->post("/admin/vendors/approve", "AdminController@approveVendor");
 $router->post("/admin/vendors/disapprove", "AdminController@disapproveVendor");
 $router->post("/admin/vendors/feature", "AdminController@featureVendor");
@@ -79,6 +86,13 @@ $router->post("/admin/categories/add", "AdminController@addCategory");
 $router->get("/admin/categories/edit/{id}", "AdminController@showEditCategory");
 $router->post("/admin/categories/edit", "AdminController@editCategory");
 $router->post("/admin/categories/delete", "AdminController@deleteCategory");
+
+// Admin Product Management
+$router->get("/admin/products", "AdminController@products");
+$router->get("/admin/products/edit/{id}", "AdminController@showEditProduct");
+$router->post("/admin/products/edit", "AdminController@editProduct");
+$router->post("/admin/products/delete", "AdminController@deleteProduct");
+$router->post("/admin/products/toggle-availability", "AdminController@toggleProductAvailability");
 
 // Admin Order Management
 $router->get("/admin/orders", "AdminController@orders");

@@ -65,7 +65,7 @@
                             <div class="product-category mb-1">{{ $product['category_name'] ?? 'Uncategorized' }}</div>
                             <h5 class="card-title">{{ $product['name'] }}</h5>
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <div class="product-price">${{ number_format($product['price'], 2) }}</div>
+                                <div class="product-price">₱{{ number_format($product['price'], 2) }}</div>
                                 <div class="rating">
                                     @for($i = 1; $i <= 5; $i++)
                                         @if($i <= round($product['avg_rating'] ?? 0))

@@ -28,7 +28,7 @@
                                     <p class="text-muted mb-0">{{ $item['business_name'] }}</p>
                                 </div>
                                 <div class="col-md-2 col-4 mt-3 mt-md-0">
-                                    <div class="product-price">${{ number_format($item['price'], 2) }}</div>
+                                    <div class="product-price">₱{{ number_format($item['price'], 2) }}</div>
                                 </div>
                                 <div class="col-md-2 col-4 mt-3 mt-md-0">
                                     <form action="/cart/update" method="POST" class="cart-quantity-form">
@@ -45,7 +45,7 @@
                                     </form>
                                 </div>
                                 <div class="col-md-2 col-4 mt-3 mt-md-0 text-end">
-                                    <div class="mb-2">${{ number_format($item['price'] * $item['quantity'], 2) }}</div>
+                                    <div class="mb-2">₱{{ number_format($item['price'] * $item['quantity'], 2) }}</div>
                                     <form action="/cart/remove" method="POST" class="d-inline">
                                         <input type="hidden" name="cart_id" value="{{ $item['cart_id'] }}">
                                         <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -81,7 +81,7 @@
             @endif
         </div>
     </div>
-    
+
     <div class="col-lg-4">
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-white">
@@ -90,18 +90,18 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between mb-2">
                     <span>Subtotal:</span>
-                    <span>${{ number_format($cartTotal, 2) }}</span>
+                    <span>₱{{ number_format($cartTotal, 2) }}</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                     <span>Delivery Fee:</span>
-                    <span>$0.00</span>
+                    <span>₱0.00</span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between mb-3">
                     <span class="fw-bold">Total:</span>
-                    <span class="cart-total">${{ number_format($cartTotal, 2) }}</span>
+                    <span class="cart-total">₱{{ number_format($cartTotal, 2) }}</span>
                 </div>
-                
+
                 @if(count($cartItems) > 0)
                     <div class="d-grid">
                         <a href="/cart/checkout" class="btn btn-primary">

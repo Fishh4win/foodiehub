@@ -27,13 +27,13 @@
                         <p class="mb-0"><strong>Customer:</strong> {{ $order['customer_name'] }}</p>
                     </div>
                 </div>
-                
+
                 @if($order['notes'])
                     <div class="alert alert-info mb-4">
                         <strong>Order Notes:</strong> {{ $order['notes'] }}
                     </div>
                 @endif
-                
+
                 <h5>Order Items</h5>
                 <div class="table-responsive">
                     <table class="table">
@@ -62,16 +62,16 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td>${{ number_format($item['price'], 2) }}</td>
+                                    <td>₱{{ number_format($item['price'], 2) }}</td>
                                     <td>{{ $item['quantity'] }}</td>
-                                    <td class="text-end">${{ number_format($item['price'] * $item['quantity'], 2) }}</td>
+                                    <td class="text-end">₱{{ number_format($item['price'] * $item['quantity'], 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                         <tfoot>
                             <tr>
                                 <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                                <td class="text-end"><strong>${{ number_format($order['total_price'], 2) }}</strong></td>
+                                <td class="text-end"><strong>₱{{ number_format($order['total_price'], 2) }}</strong></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -82,7 +82,7 @@
                     <a href="/orders" class="btn btn-outline-primary">
                         <i class="fas fa-arrow-left me-2"></i> Back to Orders
                     </a>
-                    
+
                     @if(\App\Core\Auth::hasRole('customer') && ($order['status'] == 'pending' || $order['status'] == 'preparing'))
                         <form action="/orders/cancel" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?');">
                             <input type="hidden" name="order_id" value="{{ $order['id'] }}">
@@ -108,7 +108,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-lg-4">
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-white">
@@ -122,35 +122,35 @@
                         </div>
                         <small>{{ date('M d, Y h:i A', strtotime($order['created_at'])) }}</small>
                     </li>
-                    
+
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <i class="fas fa-utensils me-2 {{ $order['status'] == 'preparing' || $order['status'] == 'out_for_delivery' || $order['status'] == 'delivered' ? 'text-primary' : 'text-muted' }}"></i> 
+                            <i class="fas fa-utensils me-2 {{ $order['status'] == 'preparing' || $order['status'] == 'out_for_delivery' || $order['status'] == 'delivered' ? 'text-primary' : 'text-muted' }}"></i>
                             Preparing
                         </div>
                         <small>{{ $order['status'] == 'preparing' || $order['status'] == 'out_for_delivery' || $order['status'] == 'delivered' ? date('M d, Y h:i A', strtotime($order['updated_at'])) : '-' }}</small>
                     </li>
-                    
+
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <i class="fas fa-truck me-2 {{ $order['status'] == 'out_for_delivery' || $order['status'] == 'delivered' ? 'text-primary' : 'text-muted' }}"></i> 
+                            <i class="fas fa-truck me-2 {{ $order['status'] == 'out_for_delivery' || $order['status'] == 'delivered' ? 'text-primary' : 'text-muted' }}"></i>
                             Out for Delivery
                         </div>
                         <small>{{ $order['status'] == 'out_for_delivery' || $order['status'] == 'delivered' ? date('M d, Y h:i A', strtotime($order['updated_at'])) : '-' }}</small>
                     </li>
-                    
+
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
-                            <i class="fas fa-check-circle me-2 {{ $order['status'] == 'delivered' ? 'text-primary' : 'text-muted' }}"></i> 
+                            <i class="fas fa-check-circle me-2 {{ $order['status'] == 'delivered' ? 'text-primary' : 'text-muted' }}"></i>
                             Delivered
                         </div>
                         <small>{{ $order['status'] == 'delivered' ? date('M d, Y h:i A', strtotime($order['updated_at'])) : '-' }}</small>
                     </li>
-                    
+
                     @if($order['status'] == 'cancelled')
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <div>
-                                <i class="fas fa-times-circle me-2 text-danger"></i> 
+                                <i class="fas fa-times-circle me-2 text-danger"></i>
                                 Cancelled
                             </div>
                             <small>{{ date('M d, Y h:i A', strtotime($order['updated_at'])) }}</small>

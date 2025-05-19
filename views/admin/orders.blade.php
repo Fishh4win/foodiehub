@@ -33,7 +33,7 @@
                 <a class="nav-link" href="#cancelled" data-bs-toggle="tab">Cancelled</a>
             </li>
         </ul>
-        
+
         <div class="tab-content">
             <div class="tab-pane fade show active" id="all-orders">
                 <div class="table-responsive">
@@ -55,7 +55,7 @@
                                     <td>#{{ $order['id'] }}</td>
                                     <td>{{ $order['customer_name'] }}</td>
                                     <td>{{ $order['vendor_business_name'] }}</td>
-                                    <td>${{ number_format($order['total_price'], 2) }}</td>
+                                    <td>₱{{ number_format($order['total_price'], 2) }}</td>
                                     <td>{{ date('M d, Y', strtotime($order['created_at'])) }}</td>
                                     <td>
                                         <span class="status-badge status-{{ $order['status'] }}">
@@ -73,23 +73,23 @@
                     </table>
                 </div>
             </div>
-            
+
             <div class="tab-pane fade" id="pending">
                 <!-- Similar table for pending orders -->
             </div>
-            
+
             <div class="tab-pane fade" id="preparing">
                 <!-- Similar table for preparing orders -->
             </div>
-            
+
             <div class="tab-pane fade" id="out-for-delivery">
                 <!-- Similar table for out for delivery orders -->
             </div>
-            
+
             <div class="tab-pane fade" id="delivered">
                 <!-- Similar table for delivered orders -->
             </div>
-            
+
             <div class="tab-pane fade" id="cancelled">
                 <!-- Similar table for cancelled orders -->
             </div>
@@ -134,7 +134,7 @@
                             <label class="form-check-label" for="status-cancelled">Cancelled</label>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="vendor" class="form-label">Vendor</label>
                         <select class="form-select" id="vendor" name="vendor">
@@ -142,7 +142,7 @@
                             <!-- Vendor options would be populated here -->
                         </select>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="date-range" class="form-label">Date Range</label>
                         <select class="form-select" id="date-range" name="date_range">
@@ -153,7 +153,7 @@
                             <option value="year">This Year</option>
                         </select>
                     </div>
-                    
+
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Apply Filters</button>

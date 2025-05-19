@@ -24,9 +24,9 @@
                                 <h2 class="card-title">{{ $product['name'] }}</h2>
                                 <p class="text-muted mb-2">{{ $product['category_name'] ?? 'Uncategorized' }}</p>
                             </div>
-                            <div class="product-price fs-3">${{ number_format($product['price'], 2) }}</div>
+                            <div class="product-price fs-3">₱{{ number_format($product['price'], 2) }}</div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <div class="rating">
                                 @php
@@ -42,15 +42,15 @@
                                 <span class="rating-count">({{ $ratingData['review_count'] ?? 0 }} reviews)</span>
                             </div>
                         </div>
-                        
+
                         <p class="card-text">{{ $product['description'] }}</p>
-                        
+
                         @if(isset($product['preparation_time']) && $product['preparation_time'])
                             <p class="card-text">
                                 <i class="fas fa-clock me-1"></i> Preparation time: {{ $product['preparation_time'] }} minutes
                             </p>
                         @endif
-                        
+
                         <div class="d-flex align-items-center mt-4">
                             <a href="/products?vendor={{ $product['vendor_id'] }}" class="text-decoration-none">
                                 <div class="d-flex align-items-center">
@@ -73,7 +73,7 @@
             </div>
             <div class="card-footer bg-white">
                 @if(\App\Core\Auth::check() && \App\Core\Auth::hasRole('customer'))
-                    <form action="/products/add-to-cart" method="POST">
+                    <form action="/cart/add" method="POST">
                         <input type="hidden" name="product_id" value="{{ $product['id'] }}">
                         <input type="hidden" name="redirect" value="/products/{{ $product['id'] }}">
                         <div class="row g-2">
@@ -102,7 +102,7 @@
                 @endif
             </div>
         </div>
-        
+
         <!-- Reviews Section -->
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-white">
@@ -140,7 +140,7 @@
                 @else
                     <p class="text-muted">No reviews yet. Be the first to review this product!</p>
                 @endif
-                
+
                 @if(\App\Core\Auth::check() && \App\Core\Auth::hasRole('customer') && !$userHasReviewed)
                     <div class="mt-4">
                         <h5>Write a Review</h5>
@@ -174,7 +174,7 @@
             </div>
         </div>
     </div>
-    
+
     <!-- Sidebar -->
     <div class="col-lg-4">
         <!-- Related Products -->
@@ -195,7 +195,7 @@
                             @endif
                             <div>
                                 <h6 class="mb-1">{{ $relatedProduct['name'] }}</h6>
-                                <div class="product-price mb-2">${{ number_format($relatedProduct['price'], 2) }}</div>
+                                <div class="product-price mb-2">₱{{ number_format($relatedProduct['price'], 2) }}</div>
                                 <a href="/products/{{ $relatedProduct['id'] }}" class="btn btn-sm btn-outline-primary">View</a>
                             </div>
                         </div>
@@ -205,4 +205,53 @@
         @endif
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Quantity buttons
+        const minusBtn = document.querySelector('.quantity-minus');
+        const plusBtn = document.querySelector('.quantity-plus');
+        const quantityInput = document.querySelector('.quantity-input');
+
+        if (minusBtn && plusBtn && quantityInput) {
+            minusBtn.addEventListener('click', function() {
+                let value = parseInt(quantityInput.value);
+                if (value > 1) {
+                    quantityInput.value = value - 1;
+                }
+            });
+
+            plusBtn.addEventListener('click', function() {
+                let value = parseInt(quantityInput.value);
+                quantityInput.value = value + 1;
+            });
+        }
+
+        // Rating stars
+        const ratingStars = document.querySelectorAll('.rating-star');
+        const ratingInput = document.querySelector('input[name="rating"]');
+
+        if (ratingStars.length && ratingInput) {
+            ratingStars.forEach((star, index) => {
+                star.addEventListener('click', function() {
+                    const rating = index + 1;
+                    ratingInput.value = rating;
+
+                    // Update stars
+                    ratingStars.forEach((s, i) => {
+                        if (i < rating) {
+                            s.classList.remove('far');
+                            s.classList.add('fas');
+                        } else {
+                            s.classList.remove('fas');
+                            s.classList.add('far');
+                        }
+                    });
+                });
+            });
+        }
+    });
+</script>
 @endsection

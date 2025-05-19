@@ -394,6 +394,202 @@ class AdminController {
     }
 
     /**
+     * Show form to edit a vendor
+     */
+    public function showEditVendor($id) {
+        // Check if user is an admin
+        Auth::requireRole('admin');
+
+        // Get vendor with details
+        $vendorModel = new Vendor();
+        $vendor = $vendorModel->getWithUserDetails($id);
+
+        if (!$vendor) {
+            Session::setFlash('error', 'Vendor not found');
+            header('Location: /admin/vendors');
+            exit;
+        }
+
+        $this->view->render("admin.edit_vendor", [
+            "title" => "Edit Vendor",
+            "vendor" => $vendor
+        ]);
+    }
+
+    /**
+     * Process editing a vendor
+     */
+    public function editVendor() {
+        // Check if user is an admin
+        Auth::requireRole('admin');
+
+        // Get form data
+        $vendorId = $_POST['vendor_id'] ?? null;
+        $userId = $_POST['user_id'] ?? null;
+        $businessName = $_POST['business_name'] ?? '';
+        $description = $_POST['description'] ?? '';
+        $location = $_POST['location'] ?? '';
+        $isApproved = isset($_POST['is_approved']) ? true : false;
+        $isFeatured = isset($_POST['is_featured']) ? true : false;
+
+        if (!$vendorId || !$userId || empty($businessName)) {
+            Session::setFlash('error', 'Please fill in all required fields');
+            header("Location: /admin/vendors/edit/{$vendorId}");
+            exit;
+        }
+
+        // Update vendor data
+        $vendorModel = new Vendor();
+        $vendorData = [
+            'business_name' => $businessName,
+            'description' => $description,
+            'location' => $location,
+            'is_approved' => $isApproved,
+            'is_featured' => $isFeatured
+        ];
+
+        // Handle logo upload
+        if (isset($_FILES['logo']) && $_FILES['logo']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/vendors/';
+
+            // Create directory if it doesn't exist
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            $fileName = time() . '_' . basename($_FILES['logo']['name']);
+            $uploadFile = $uploadDir . $fileName;
+
+            // Check if file is an image
+            $imageInfo = getimagesize($_FILES['logo']['tmp_name']);
+            if ($imageInfo === false) {
+                Session::setFlash('error', 'Uploaded file is not an image');
+                header("Location: /admin/vendors/edit/{$vendorId}");
+                exit;
+            }
+
+            // Move uploaded file
+            if (move_uploaded_file($_FILES['logo']['tmp_name'], $uploadFile)) {
+                $vendorData['logo'] = $uploadFile;
+            } else {
+                Session::setFlash('error', 'Failed to upload logo');
+                header("Location: /admin/vendors/edit/{$vendorId}");
+                exit;
+            }
+        }
+
+        // Handle banner upload
+        if (isset($_FILES['banner']) && $_FILES['banner']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/vendors/';
+
+            // Create directory if it doesn't exist
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            $fileName = time() . '_banner_' . basename($_FILES['banner']['name']);
+            $uploadFile = $uploadDir . $fileName;
+
+            // Check if file is an image
+            $imageInfo = getimagesize($_FILES['banner']['tmp_name']);
+            if ($imageInfo === false) {
+                Session::setFlash('error', 'Uploaded file is not an image');
+                header("Location: /admin/vendors/edit/{$vendorId}");
+                exit;
+            }
+
+            // Move uploaded file
+            if (move_uploaded_file($_FILES['banner']['tmp_name'], $uploadFile)) {
+                $vendorData['banner'] = $uploadFile;
+            } else {
+                Session::setFlash('error', 'Failed to upload banner');
+                header("Location: /admin/vendors/edit/{$vendorId}");
+                exit;
+            }
+        }
+
+        // Update vendor
+        $result = $vendorModel->update($vendorId, $vendorData);
+
+        // Update user data if provided
+        $name = $_POST['name'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $phone = $_POST['phone'] ?? '';
+
+        if (!empty($name) || !empty($email) || !empty($phone)) {
+            $userModel = new User();
+            $userData = [];
+
+            if (!empty($name)) {
+                $userData['name'] = $name;
+            }
+
+            if (!empty($email)) {
+                // Check if email already exists for another user
+                $existingUser = $userModel->getByEmail($email);
+                if ($existingUser && $existingUser['id'] != $userId) {
+                    Session::setFlash('error', 'Email already exists');
+                    header("Location: /admin/vendors/edit/{$vendorId}");
+                    exit;
+                }
+
+                $userData['email'] = $email;
+            }
+
+            if (!empty($phone)) {
+                $userData['phone'] = $phone;
+            }
+
+            if (!empty($userData)) {
+                $userModel->update($userId, $userData);
+            }
+        }
+
+        if ($result) {
+            Session::setFlash('success', 'Vendor updated successfully');
+            header('Location: /admin/vendors');
+            exit;
+        } else {
+            Session::setFlash('error', 'Failed to update vendor');
+            header("Location: /admin/vendors/edit/{$vendorId}");
+            exit;
+        }
+    }
+
+    /**
+     * Show vendor products
+     */
+    public function vendorProducts($id) {
+        // Check if user is an admin
+        Auth::requireRole('admin');
+
+        // Get vendor with details
+        $vendorModel = new Vendor();
+        $vendor = $vendorModel->getWithUserDetails($id);
+
+        if (!$vendor) {
+            Session::setFlash('error', 'Vendor not found');
+            header('Location: /admin/vendors');
+            exit;
+        }
+
+        // Get vendor products
+        $productModel = new Product();
+        $products = $productModel->getByVendorId($vendor['id']);
+
+        // Get categories for filter
+        $categoryModel = new Category();
+        $categories = $categoryModel->all();
+
+        $this->view->render("admin.vendor_products", [
+            "title" => "Vendor Products",
+            "vendor" => $vendor,
+            "products" => $products,
+            "categories" => $categories
+        ]);
+    }
+
+    /**
      * Show categories list
      */
     public function categories() {
@@ -625,5 +821,237 @@ class AdminController {
             "title" => "Manage Orders",
             "orders" => $orders
         ]);
+    }
+
+    /**
+     * Show all products
+     */
+    public function products() {
+        // Check if user is an admin
+        Auth::requireRole('admin');
+
+        // Get filter parameters
+        $categoryId = $_GET['category'] ?? null;
+        $vendorId = $_GET['vendor'] ?? null;
+        $search = $_GET['search'] ?? null;
+
+        // Get categories for filter
+        $categoryModel = new Category();
+        $categories = $categoryModel->all();
+
+        // Get vendors for filter
+        $vendorModel = new Vendor();
+        $vendors = $vendorModel->getAllWithUserDetails();
+
+        // Build filters array
+        $filters = [
+            'category_id' => $categoryId,
+            'vendor_id' => $vendorId
+        ];
+
+        // Get products based on filters
+        $productModel = new Product();
+        if ($search) {
+            $products = $productModel->search($search);
+        } else {
+            $products = $productModel->filter($filters);
+        }
+
+        $this->view->render("admin.products", [
+            "title" => "Manage Products",
+            "products" => $products,
+            "categories" => $categories,
+            "vendors" => $vendors,
+            "filters" => [
+                "category" => $categoryId,
+                "vendor" => $vendorId,
+                "search" => $search
+            ]
+        ]);
+    }
+
+    /**
+     * Show form to edit a product
+     */
+    public function showEditProduct($id) {
+        // Check if user is an admin
+        Auth::requireRole('admin');
+
+        // Get product
+        $productModel = new Product();
+        $product = $productModel->getWithVendorDetails($id);
+
+        if (!$product) {
+            Session::setFlash('error', 'Product not found');
+            header('Location: /admin/products');
+            exit;
+        }
+
+        // Get categories
+        $categoryModel = new Category();
+        $categories = $categoryModel->all();
+
+        $this->view->render("admin.edit_product", [
+            "title" => "Edit Product",
+            "product" => $product,
+            "categories" => $categories
+        ]);
+    }
+
+    /**
+     * Process editing a product
+     */
+    public function editProduct() {
+        // Check if user is an admin
+        Auth::requireRole('admin');
+
+        // Get form data
+        $productId = $_POST['product_id'] ?? null;
+        $name = $_POST['name'] ?? '';
+        $description = $_POST['description'] ?? '';
+        $price = $_POST['price'] ?? '';
+        $categoryId = $_POST['category_id'] ?? null;
+        $preparationTime = $_POST['preparation_time'] ?? null;
+        $isAvailable = isset($_POST['is_available']) ? true : false;
+
+        if (!$productId || empty($name) || empty($price)) {
+            Session::setFlash('error', 'Please fill in all required fields');
+            header("Location: /admin/products/edit/{$productId}");
+            exit;
+        }
+
+        // Get product to check vendor
+        $productModel = new Product();
+        $product = $productModel->find($productId);
+
+        if (!$product) {
+            Session::setFlash('error', 'Product not found');
+            header('Location: /admin/products');
+            exit;
+        }
+
+        // Handle image upload
+        $image = $product['image']; // Keep existing image by default
+
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = 'uploads/products/';
+
+            // Create directory if it doesn't exist
+            if (!file_exists($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            $fileName = time() . '_' . basename($_FILES['image']['name']);
+            $uploadFile = $uploadDir . $fileName;
+
+            // Check if file is an image
+            $imageInfo = getimagesize($_FILES['image']['tmp_name']);
+            if ($imageInfo === false) {
+                Session::setFlash('error', 'Uploaded file is not an image');
+                header("Location: /admin/products/edit/{$productId}");
+                exit;
+            }
+
+            // Move uploaded file
+            if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadFile)) {
+                $image = $uploadFile;
+            } else {
+                Session::setFlash('error', 'Failed to upload image');
+                header("Location: /admin/products/edit/{$productId}");
+                exit;
+            }
+        }
+
+        // Update product
+        $result = $productModel->update($productId, [
+            'name' => $name,
+            'description' => $description,
+            'price' => $price,
+            'image' => $image,
+            'category_id' => $categoryId,
+            'preparation_time' => $preparationTime,
+            'is_available' => $isAvailable
+        ]);
+
+        if ($result) {
+            Session::setFlash('success', 'Product updated successfully');
+            header('Location: /admin/products');
+            exit;
+        } else {
+            Session::setFlash('error', 'Failed to update product');
+            header("Location: /admin/products/edit/{$productId}");
+            exit;
+        }
+    }
+
+    /**
+     * Delete a product
+     */
+    public function deleteProduct() {
+        // Check if user is an admin
+        Auth::requireRole('admin');
+
+        // Get product ID
+        $productId = $_POST['product_id'] ?? null;
+
+        if (!$productId) {
+            Session::setFlash('error', 'Invalid product');
+            header('Location: /admin/products');
+            exit;
+        }
+
+        // Delete product
+        $productModel = new Product();
+        $result = $productModel->delete($productId);
+
+        if ($result) {
+            Session::setFlash('success', 'Product deleted successfully');
+        } else {
+            Session::setFlash('error', 'Failed to delete product');
+        }
+
+        header('Location: /admin/products');
+        exit;
+    }
+
+    /**
+     * Toggle product availability
+     */
+    public function toggleProductAvailability() {
+        // Check if user is an admin
+        Auth::requireRole('admin');
+
+        // Get product ID
+        $productId = $_POST['product_id'] ?? null;
+
+        if (!$productId) {
+            Session::setFlash('error', 'Invalid product');
+            header('Location: /admin/products');
+            exit;
+        }
+
+        // Get product
+        $productModel = new Product();
+        $product = $productModel->find($productId);
+
+        if (!$product) {
+            Session::setFlash('error', 'Product not found');
+            header('Location: /admin/products');
+            exit;
+        }
+
+        // Toggle availability
+        $isAvailable = !$product['is_available'];
+        $result = $productModel->update($productId, ['is_available' => $isAvailable]);
+
+        if ($result) {
+            $status = $isAvailable ? 'available' : 'unavailable';
+            Session::setFlash('success', "Product marked as {$status}");
+        } else {
+            Session::setFlash('error', 'Failed to update product availability');
+        }
+
+        header('Location: /admin/products');
+        exit;
     }
 }

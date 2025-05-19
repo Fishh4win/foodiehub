@@ -14,7 +14,7 @@
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle me-2"></i> You have items from multiple vendors. Please place separate orders for each vendor.
                     </div>
-                    
+
                     @foreach($cartItemsByVendor as $vendorId => $vendorData)
                         <div class="card mb-4">
                             <div class="card-header bg-light">
@@ -36,22 +36,22 @@
                                             <h6 class="mb-0">{{ $item['name'] }}</h6>
                                             <div class="d-flex justify-content-between align-items-center mt-2">
                                                 <div class="text-muted">
-                                                    <small>${{ number_format($item['price'], 2) }} x {{ $item['quantity'] }}</small>
+                                                    <small>₱{{ number_format($item['price'], 2) }} x {{ $item['quantity'] }}</small>
                                                 </div>
-                                                <div class="fw-bold">${{ number_format($item['price'] * $item['quantity'], 2) }}</div>
+                                                <div class="fw-bold">₱{{ number_format($item['price'] * $item['quantity'], 2) }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 @endforeach
-                                
+
                                 <form action="/orders/place" method="POST">
                                     <input type="hidden" name="vendor_id" value="{{ $vendorId }}">
-                                    
+
                                     <div class="mb-3">
                                         <label for="delivery_address_{{ $vendorId }}" class="form-label">Delivery Address</label>
                                         <textarea class="form-control" id="delivery_address_{{ $vendorId }}" name="delivery_address" rows="3" required></textarea>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <label for="payment_method_{{ $vendorId }}" class="form-label">Payment Method</label>
                                         <select class="form-select" id="payment_method_{{ $vendorId }}" name="payment_method" required>
@@ -60,12 +60,12 @@
                                             <option value="paypal">PayPal</option>
                                         </select>
                                     </div>
-                                    
+
                                     <div class="mb-3">
                                         <label for="notes_{{ $vendorId }}" class="form-label">Order Notes (Optional)</label>
                                         <textarea class="form-control" id="notes_{{ $vendorId }}" name="notes" rows="2"></textarea>
                                     </div>
-                                    
+
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
                                             <span class="fw-bold">Total:</span>
@@ -75,7 +75,7 @@
                                                     $vendorTotal += $item['price'] * $item['quantity'];
                                                 }
                                             @endphp
-                                            <span class="fs-5 ms-2">${{ number_format($vendorTotal, 2) }}</span>
+                                            <span class="fs-5 ms-2">₱{{ number_format($vendorTotal, 2) }}</span>
                                         </div>
                                         <button type="submit" class="btn btn-primary">
                                             <i class="fas fa-check me-2"></i> Place Order
@@ -96,7 +96,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="col-lg-4">
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-white">
@@ -105,22 +105,22 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between mb-2">
                     <span>Subtotal:</span>
-                    <span>${{ number_format($cartTotal, 2) }}</span>
+                    <span>₱{{ number_format($cartTotal, 2) }}</span>
                 </div>
                 <div class="d-flex justify-content-between mb-2">
                     <span>Delivery Fee:</span>
-                    <span>$0.00</span>
+                    <span>₱0.00</span>
                 </div>
                 <hr>
                 <div class="d-flex justify-content-between mb-3">
                     <span class="fw-bold">Total:</span>
-                    <span class="cart-total">${{ number_format($cartTotal, 2) }}</span>
+                    <span class="cart-total">₱{{ number_format($cartTotal, 2) }}</span>
                 </div>
-                
+
                 <div class="alert alert-warning">
                     <i class="fas fa-info-circle me-2"></i> Please place separate orders for each vendor.
                 </div>
-                
+
                 <div class="d-grid mt-3">
                     <a href="/cart" class="btn btn-outline-primary">
                         <i class="fas fa-arrow-left me-2"></i> Back to Cart

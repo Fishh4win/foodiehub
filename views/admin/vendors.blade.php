@@ -27,7 +27,7 @@
                 <a class="nav-link" href="#featured" data-bs-toggle="tab">Featured</a>
             </li>
         </ul>
-        
+
         <div class="tab-content">
             <div class="tab-pane fade show active" id="all-vendors">
                 <div class="table-responsive">
@@ -72,7 +72,7 @@
                                         @else
                                             <span class="badge badge-pending">Pending</span>
                                         @endif
-                                        
+
                                         @if($vendor['is_featured'])
                                             <span class="badge badge-featured">Featured</span>
                                         @endif
@@ -82,7 +82,13 @@
                                             <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewVendorModal{{ $vendor['id'] }}">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            
+                                            <a href="/admin/vendors/edit/{{ $vendor['id'] }}" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="Edit Vendor">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="/admin/vendors/{{ $vendor['id'] }}/products" class="btn btn-sm btn-outline-dark" data-bs-toggle="tooltip" title="View Products">
+                                                <i class="fas fa-hamburger"></i>
+                                            </a>
+
                                             @if(!$vendor['is_approved'])
                                                 <form action="/admin/vendors/approve" method="POST">
                                                     <input type="hidden" name="vendor_id" value="{{ $vendor['id'] }}">
@@ -98,7 +104,7 @@
                                                     </button>
                                                 </form>
                                             @endif
-                                            
+
                                             @if(!$vendor['is_featured'])
                                                 <form action="/admin/vendors/feature" method="POST">
                                                     <input type="hidden" name="vendor_id" value="{{ $vendor['id'] }}">
@@ -115,7 +121,7 @@
                                                 </form>
                                             @endif
                                         </div>
-                                        
+
                                         <!-- View Vendor Modal -->
                                         <div class="modal fade" id="viewVendorModal{{ $vendor['id'] }}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog modal-lg">
@@ -134,7 +140,7 @@
                                                                         <i class="fas fa-store fa-4x text-secondary"></i>
                                                                     </div>
                                                                 @endif
-                                                                
+
                                                                 <div class="d-grid gap-2">
                                                                     @if(!$vendor['is_approved'])
                                                                         <form action="/admin/vendors/approve" method="POST">
@@ -151,7 +157,7 @@
                                                                             </button>
                                                                         </form>
                                                                     @endif
-                                                                    
+
                                                                     @if(!$vendor['is_featured'])
                                                                         <form action="/admin/vendors/feature" method="POST">
                                                                             <input type="hidden" name="vendor_id" value="{{ $vendor['id'] }}">
@@ -172,7 +178,7 @@
                                                             <div class="col-md-8">
                                                                 <h4>{{ $vendor['business_name'] }}</h4>
                                                                 <p class="text-muted">{{ $vendor['description'] }}</p>
-                                                                
+
                                                                 <div class="row mb-3">
                                                                     <div class="col-md-6">
                                                                         <h6>Owner Information</h6>
@@ -183,14 +189,14 @@
                                                                     <div class="col-md-6">
                                                                         <h6>Business Information</h6>
                                                                         <p class="mb-1"><strong>Location:</strong> {{ $vendor['location'] }}</p>
-                                                                        <p class="mb-1"><strong>Status:</strong> 
+                                                                        <p class="mb-1"><strong>Status:</strong>
                                                                             @if($vendor['is_approved'])
                                                                                 <span class="badge badge-approved">Approved</span>
                                                                             @else
                                                                                 <span class="badge badge-pending">Pending</span>
                                                                             @endif
                                                                         </p>
-                                                                        <p class="mb-1"><strong>Featured:</strong> 
+                                                                        <p class="mb-1"><strong>Featured:</strong>
                                                                             @if($vendor['is_featured'])
                                                                                 <span class="badge badge-featured">Yes</span>
                                                                             @else
@@ -199,13 +205,18 @@
                                                                         </p>
                                                                     </div>
                                                                 </div>
-                                                                
-                                                                <div class="d-flex justify-content-between">
-                                                                    <a href="/products?vendor={{ $vendor['id'] }}" class="btn btn-outline-primary" target="_blank">
-                                                                        <i class="fas fa-hamburger me-2"></i> View Products
+
+                                                                <div class="d-flex justify-content-between mb-3">
+                                                                    <a href="/admin/vendors/{{ $vendor['id'] }}/products" class="btn btn-outline-primary">
+                                                                        <i class="fas fa-hamburger me-2"></i> Manage Products
                                                                     </a>
                                                                     <a href="/admin/orders?vendor={{ $vendor['id'] }}" class="btn btn-outline-info">
                                                                         <i class="fas fa-shopping-cart me-2"></i> View Orders
+                                                                    </a>
+                                                                </div>
+                                                                <div class="d-grid">
+                                                                    <a href="/admin/vendors/edit/{{ $vendor['id'] }}" class="btn btn-primary">
+                                                                        <i class="fas fa-edit me-2"></i> Edit Vendor
                                                                     </a>
                                                                 </div>
                                                             </div>
@@ -221,7 +232,7 @@
                     </table>
                 </div>
             </div>
-            
+
             <div class="tab-pane fade" id="pending-approval">
                 <div class="table-responsive">
                     <table class="table table-hover">
@@ -264,6 +275,12 @@
                                                 <a href="#" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#viewVendorModal{{ $vendor['id'] }}">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
+                                                <a href="/admin/vendors/edit/{{ $vendor['id'] }}" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="Edit Vendor">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="/admin/vendors/{{ $vendor['id'] }}/products" class="btn btn-sm btn-outline-dark" data-bs-toggle="tooltip" title="View Products">
+                                                    <i class="fas fa-hamburger"></i>
+                                                </a>
                                                 <form action="/admin/vendors/approve" method="POST">
                                                     <input type="hidden" name="vendor_id" value="{{ $vendor['id'] }}">
                                                     <button type="submit" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Approve Vendor">
@@ -279,11 +296,11 @@
                     </table>
                 </div>
             </div>
-            
+
             <div class="tab-pane fade" id="approved">
                 <!-- Similar table for approved vendors -->
             </div>
-            
+
             <div class="tab-pane fade" id="featured">
                 <!-- Similar table for featured vendors -->
             </div>
@@ -320,7 +337,7 @@
                             <label class="form-check-label" for="status-featured">Featured</label>
                         </div>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="date-range" class="form-label">Date Range</label>
                         <select class="form-select" id="date-range" name="date_range">
@@ -331,7 +348,7 @@
                             <option value="year">This Year</option>
                         </select>
                     </div>
-                    
+
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Apply Filters</button>

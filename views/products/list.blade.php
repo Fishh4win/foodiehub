@@ -89,7 +89,7 @@
                                 <div class="product-category mb-1">{{ $product['category_name'] ?? 'Uncategorized' }}</div>
                                 <h5 class="card-title">{{ $product['name'] }}</h5>
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <div class="product-price">${{ number_format($product['price'], 2) }}</div>
+                                    <div class="product-price">₱{{ number_format($product['price'], 2) }}</div>
                                     <div class="rating">
                                         @php
                                             $rating = isset($product['avg_rating']) ? round($product['avg_rating']) : 0;
@@ -106,8 +106,26 @@
                                 <p class="card-text">{{ isset($product['description']) ? \Illuminate\Support\Str::limit($product['description'], 60) : '' }}</p>
                             </div>
                             <div class="card-footer bg-white">
-                                <div class="d-grid">
-                                    <a href="/products/{{ $product['id'] }}" class="btn btn-primary">View Details</a>
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <a href="/products/{{ $product['id'] }}" class="btn btn-primary w-100">View Details</a>
+                                    </div>
+                                    <div class="col-6">
+                                        @if(\App\Core\Auth::check() && \App\Core\Auth::hasRole('customer'))
+                                            <form action="/cart/add" method="POST">
+                                                <input type="hidden" name="product_id" value="{{ $product['id'] }}">
+                                                <input type="hidden" name="quantity" value="1">
+                                                <input type="hidden" name="redirect" value="/products">
+                                                <button type="submit" class="btn btn-outline-primary w-100">
+                                                    <i class="fas fa-cart-plus"></i> Add
+                                                </button>
+                                            </form>
+                                        @elseif(!\App\Core\Auth::check())
+                                            <a href="/login" class="btn btn-outline-primary w-100">
+                                                <i class="fas fa-cart-plus"></i> Add
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                         </div>

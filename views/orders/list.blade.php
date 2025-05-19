@@ -27,7 +27,7 @@
                                 <td>#{{ $order['id'] }}</td>
                                 <td>{{ $order['vendor_business_name'] ?? 'Unknown Vendor' }}</td>
                                 <td>{{ date('M d, Y', strtotime($order['created_at'])) }}</td>
-                                <td>${{ number_format($order['total_price'], 2) }}</td>
+                                <td>₱{{ number_format($order['total_price'], 2) }}</td>
                                 <td>
                                     <span class="status-badge status-{{ $order['status'] }}">
                                         {{ ucfirst(str_replace('_', ' ', $order['status'])) }}
